@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Globalization;
+using System.Diagnostics;
 
 namespace BlueprintIT.HttpServer
 {
@@ -67,7 +68,7 @@ namespace BlueprintIT.HttpServer
     {
       if ((canWrite) && (writePos > 0))
       {
-        byte[] bytes = Encoding.ASCII.GetBytes(writePos + "\r\n");
+        byte[] bytes = Encoding.ASCII.GetBytes(writePos.ToString("X") + "\r\n");
         stream.Write(bytes, 0, bytes.Length);
         stream.Write(writeBuffer, 0, writePos);
         bytes = Encoding.ASCII.GetBytes("\r\n");
@@ -109,25 +110,24 @@ namespace BlueprintIT.HttpServer
       int readLength = int.Parse(HttpRequest.ReadLine(stream), NumberStyles.HexNumber);
       if (readLength > 0)
       {
+        Debug.WriteLine("Reading chunk of length " + readLength);
         readBuffer = new byte[readLength];
         readPos = 0;
         int pos = 0;
         while (pos < readLength)
         {
           int read = stream.Read(readBuffer, pos, readLength - pos);
+          Debug.WriteLine("Read " + read + " bytes");
           if (read == 0)
             throw new EndOfStreamException("Unexpected end of stream");
 
           pos += read;
         }
+        Debug.WriteLine("Data read");
         HttpRequest.ReadLine(stream);
         return true;
       }
-      string line = HttpRequest.ReadLine(stream);
-      while (line.Length > 0)
-      {
-        line = HttpRequest.ReadLine(stream);
-      }
+      Debug.WriteLine("Chunk read");
       return false;
     }
 

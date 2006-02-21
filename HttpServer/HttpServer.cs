@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Threading;
 using System.Text;
@@ -10,11 +11,13 @@ namespace BlueprintIT.HttpServer
 {
   public delegate void RequestHandler(HttpRequest request);
 
-  class HttpServer
+  public class HttpServer
   {
     private IList<IPEndPoint> addresses = new List<IPEndPoint>();
     private IList<Thread> threads = new List<Thread>();
     private bool started = false;
+
+    private RequestHandler defaultHandler;
 
     private WaitCallback callback;
 
@@ -31,6 +34,19 @@ namespace BlueprintIT.HttpServer
     public HttpServer(IPAddress address, int port) : this()
     {
       addresses.Add(new IPEndPoint(address, port));
+    }
+
+    public RequestHandler DefaultHandler
+    {
+      get
+      {
+        return defaultHandler;
+      }
+
+      set
+      {
+        defaultHandler = value;
+      }
     }
 
     public void Start()
@@ -72,17 +88,31 @@ namespace BlueprintIT.HttpServer
 
     private void Handle(object cl)
     {
+      Debug.WriteLine("Handling new client");
       TcpClient client = (TcpClient)cl;
       Stream stream = client.GetStream();
-      while (client.Connected)
+      try
       {
-        HttpRequest request = new HttpRequest(client, stream);
-        request.Close();
-        if (request.RequestHeaders["Connection"] == "close")
+        while (client.Connected)
         {
-          client.Close();
-          break;
+          HttpRequest request = new HttpRequest(client, stream);
+          try
+          {
+            defaultHandler(request);
+          }
+          catch (Exception e)
+          {
+          }
+          request.Close();
+          if (request.RequestHeaders["Connection"] == "close")
+          {
+            client.Close();
+            break;
+          }
         }
+      }
+      catch (Exception e)
+      {
       }
     }
   }

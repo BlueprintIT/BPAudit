@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Net.Sockets;
 using System.IO.Compression;
+using System.Diagnostics;
 
 namespace BlueprintIT.HttpServer
 {
@@ -12,6 +13,7 @@ namespace BlueprintIT.HttpServer
     private string method;
     private string path;
     private string version;
+    private int statusCode = 200;
 
     private TcpClient client;
     private Stream stream;
@@ -38,6 +40,8 @@ namespace BlueprintIT.HttpServer
       method = line.Substring(0, pos);
       path = line.Substring(pos + 1);
 
+      Debug.WriteLine("Read request: " + method + " " + path);
+
       if (version == "1.0")
       {
         requestHeaders["Connection"] = "close";
@@ -47,6 +51,7 @@ namespace BlueprintIT.HttpServer
       while (line.Length > 0)
       {
         DecodeHeader(line);
+        line = ReadLine(stream);
       }
 
       if ((requestHeaders.ContainsKey("Transfer-Encoding")) || (requestHeaders.ContainsKey("Content-Length")))
@@ -102,7 +107,11 @@ namespace BlueprintIT.HttpServer
       int pos = 0;
       do
       {
-        buffer[pos] = (byte)stream.ReadByte();
+        int current = stream.ReadByte();
+        if (current < 0)
+          throw new EndOfStreamException("Unexpected end of stream.");
+
+        buffer[pos] = (byte)current;
         pos++;
       } while ((buffer[pos - 1] != 10) || (buffer[pos - 2] != 13));
       return Encoding.ASCII.GetString(buffer, 0, pos - 2);
@@ -113,6 +122,8 @@ namespace BlueprintIT.HttpServer
       if (responseHeaders != null)
       {
         byte[] bytes;
+        bytes = Encoding.ASCII.GetBytes("HTTP/"+version+" "+statusCode+" "+StatusText+"\r\n");
+        stream.Write(bytes, 0, bytes.Length);
         foreach (string key in responseHeaders.Keys)
         {
           string line = key + ": " + responseHeaders[key] + "\r\n";
@@ -130,9 +141,31 @@ namespace BlueprintIT.HttpServer
       if (!closed)
       {
         closed = true;
-        requestStream.Close();
+        if (requestStream!=null)
+          requestStream.Close();
         SendResponseHeaders();
         responseStream.Close();
+      }
+    }
+
+    public int StatusCode
+    {
+      get
+      {
+        return statusCode;
+      }
+
+      set
+      {
+        statusCode = value;
+      }
+    }
+
+    public string StatusText
+    {
+      get
+      {
+        return "Generic Status";
       }
     }
 
