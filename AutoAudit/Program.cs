@@ -19,7 +19,7 @@ namespace AutoAudit
       //
       //   ServicesToRun = new ServiceBase[] {new Service1(), new MySecondUserService()};
       //
-      ServicesToRun = new ServiceBase[] { new Service1() };
+      ServicesToRun = new ServiceBase[] { new AutoAudit() };
 
       ServiceBase.Run(ServicesToRun);
     }

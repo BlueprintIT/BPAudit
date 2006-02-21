@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpServer", "HttpServer\Ht
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuditTool", "AuditTool\AuditTool.csproj", "{BFA5AD9D-FFA2-4808-A93D-1BEC7B688EC8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utils", "Utils\Utils.csproj", "{20976BAB-F9DA-4430-A032-346FD0BC7C29}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{BFA5AD9D-FFA2-4808-A93D-1BEC7B688EC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BFA5AD9D-FFA2-4808-A93D-1BEC7B688EC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BFA5AD9D-FFA2-4808-A93D-1BEC7B688EC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20976BAB-F9DA-4430-A032-346FD0BC7C29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20976BAB-F9DA-4430-A032-346FD0BC7C29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20976BAB-F9DA-4430-A032-346FD0BC7C29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20976BAB-F9DA-4430-A032-346FD0BC7C29}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
