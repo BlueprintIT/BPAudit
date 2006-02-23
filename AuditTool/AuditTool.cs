@@ -3,16 +3,26 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Text;
+using System.IO;
+using System.Xml;
 using System.Windows.Forms;
+using BlueprintIT.Audit;
+using System.Diagnostics;
+using System.Text;
+using System.Net;
 
-namespace AuditTool
+namespace BlueprintIT.Audit.AuditTool
 {
-  public partial class Form1 : Form
+  public partial class AuditTool : Form
   {
-    public Form1()
+    public AuditTool()
     {
       InitializeComponent();
+    }
+
+    private void button1_Click(object sender, EventArgs e)
+    {
+      AuditManager.AuditAndSubmit();
     }
   }
 }

@@ -7,7 +7,7 @@
     <ProjectGuid>{DCBDFAAE-7C5F-44AC-8634-933F29E20779}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BueprintIT.Audit</RootNamespace>
+    <RootNamespace>BlueprintIT.Audit</RootNamespace>
     <AssemblyName>AuditLibrary</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -30,10 +30,16 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AuditManager.cs" />
+    <Compile Include="DiskAuditor.cs" />
+    <Compile Include="NetworkAuditor.cs" />
+    <Compile Include="ProcessAuditor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceAuditor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

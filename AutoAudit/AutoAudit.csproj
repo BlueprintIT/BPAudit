@@ -48,10 +48,6 @@
       <Project>{DCBDFAAE-7C5F-44AC-8634-933F29E20779}</Project>
       <Name>AuditLibrary</Name>
     </ProjectReference>
-    <ProjectReference Include="..\HttpServer\HttpServer.csproj">
-      <Project>{D93AF505-4351-4A16-8A0D-82D72B32E97C}</Project>
-      <Name>HttpServer</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Utils\Utils.csproj">
       <Project>{20976BAB-F9DA-4430-A032-346FD0BC7C29}</Project>
       <Name>Utils</Name>

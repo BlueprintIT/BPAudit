@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace AuditTool
+namespace BlueprintIT.Audit.AuditTool
 {
   static class Program
   {
@@ -14,7 +14,7 @@ namespace AuditTool
     {
       Application.EnableVisualStyles();
       Application.SetCompatibleTextRenderingDefault(false);
-      Application.Run(new Form1());
+      Application.Run(new AuditTool());
     }
   }
 }
