@@ -82,7 +82,13 @@ namespace BlueprintIT.HttpServer
           if (client.Connected)
             ThreadPool.QueueUserWorkItem(callback, client);
         }
-        Thread.Sleep(100);
+        try
+        {
+          Thread.Sleep(100);
+        }
+        catch (ThreadInterruptedException)
+        {
+        }
       }
     }
 

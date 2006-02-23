@@ -5,6 +5,7 @@ using System.Text;
 using System.Net.Sockets;
 using System.IO.Compression;
 using System.Diagnostics;
+using System.Xml;
 
 namespace BlueprintIT.HttpServer
 {
@@ -14,6 +15,7 @@ namespace BlueprintIT.HttpServer
     private string path;
     private string version;
     private int statusCode = 200;
+    private string statusText = "OK";
 
     private TcpClient client;
     private Stream stream;
@@ -34,13 +36,13 @@ namespace BlueprintIT.HttpServer
 
       string line = ReadLine(stream);
       int pos = line.LastIndexOf("HTTP/");
-      version = line.Substring(pos + 5);
+      version = line.Substring(pos + 5).TrimEnd();
       line = line.Substring(0, pos);
       pos = line.IndexOf(" ");
       method = line.Substring(0, pos);
-      path = line.Substring(pos + 1);
+      path = line.Substring(pos + 1).Trim();
 
-      Debug.WriteLine("Read request: " + method + " " + path);
+      Debug.WriteLine("Read request: \"" + method + "\" \"" + path + "\"");
 
       if (version == "1.0")
       {
@@ -136,6 +138,28 @@ namespace BlueprintIT.HttpServer
       }
     }
 
+    public void SendResponse(string response)
+    {
+      responseHeaders["Content-Length"] = Encoding.UTF8.GetByteCount(response).ToString();
+      TextWriter writer = new StreamWriter(ResponseStream, Encoding.UTF8);
+      writer.Write(response);
+      writer.Close();
+      Close();
+    }
+
+    public void SendResponseXML(XmlDocument document)
+    {
+      StringBuilder content = new StringBuilder();
+      XmlWriterSettings settings = new XmlWriterSettings();
+      settings.Indent = true;
+      settings.IndentChars = "  ";
+      XmlWriter writer = XmlWriter.Create(content, settings);
+      document.WriteTo(writer);
+      writer.Flush();
+      writer.Close();
+      SendResponse(content.ToString());
+    }
+
     public void Close()
     {
       if (!closed)
@@ -150,87 +174,65 @@ namespace BlueprintIT.HttpServer
 
     public int StatusCode
     {
-      get
-      {
-        return statusCode;
-      }
-
-      set
-      {
-        statusCode = value;
-      }
+      get { return statusCode; }
+      set { statusCode = value; }
     }
 
     public string StatusText
     {
-      get
-      {
-        return "Generic Status";
-      }
+      get { return statusText; }
+      set { statusText = value; }
     }
 
     public TcpClient Client
     {
-      get
-      {
-        return client;
-      }
+      get { return client; }
     }
 
     public string Method
     {
-      get
-      {
-        return method;
-      }
+      get { return method; }
     }
 
     public string Path
     {
-      get
-      {
-        return path;
-      }
+      get { return path; }
     }
 
     public string Host
     {
-      get
-      {
-        return requestHeaders["Host"];
-      }
+      get { return requestHeaders["Host"]; }
     }
 
-    public string Version
+    public string HttpVersion
     {
-      get
-      {
-        return version;
-      }
+      get { return version; }
+    }
+
+    public string RequestContentType
+    {
+      get { return requestHeaders["Content-Type"]; }
+    }
+
+    public string ResponseContentType
+    {
+      get { return responseHeaders["Content-Type"]; }
+      set { responseHeaders["Content-Type"] = value; }
     }
 
     public IDictionary<string, string> RequestHeaders
     {
-      get
-      {
-        return requestHeaders;
-      }
+      get { return requestHeaders; }
     }
 
     public IDictionary<string, string> ResponseHeaders
     {
-      get
-      {
-        return responseHeaders;
-      }
+      get { return responseHeaders; }
     }
 
     public Stream RequestStream
     {
-      get
-      {
-        return requestStream;
-      }
+      get { return requestStream; }
     }
 
     public Stream ResponseStream
