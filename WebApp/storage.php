@@ -13,7 +13,7 @@ class StorageResult
 	public function fetch()
 	{
 		$this->offset++;
-		return $this->result->fetch_row();
+		return $this->result->fetch_array();
 	}
 	
 	public function fetchObject()
