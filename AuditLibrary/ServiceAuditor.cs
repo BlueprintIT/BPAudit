@@ -8,29 +8,37 @@ namespace BlueprintIT.Audit
 {
   internal class ServiceAuditor : Auditor
   {
-    public override string ID
+    public string ID
     {
-      get { return "ServiceAudit"; }
+      get { return "services"; }
     }
 
-    public override void Audit(XmlElement el)
+    public string[] Component
     {
-      XmlElement element = el.OwnerDocument.CreateElement(ID);
-      el.AppendChild(element);
+      get { return new string[] { ID }; }
+    }
 
+    public void Audit(XmlElement element)
+    {
+      XmlElement services = element.OwnerDocument.CreateElement("component", AuditManager.AUDIT_NS);
+      services.SetAttribute("id", "services");
+      element.AppendChild(services);
       foreach (ServiceController service in ServiceController.GetServices())
       {
-        XmlElement sel = element.OwnerDocument.CreateElement("Service");
-        element.AppendChild(sel);
+        XmlElement sel = element.OwnerDocument.CreateElement("component", AuditManager.AUDIT_NS);
+        services.AppendChild(sel);
         sel.SetAttribute("id", service.ServiceName);
         sel.SetAttribute("name", service.DisplayName);
         sel.SetAttribute("status", service.Status.ToString().ToLower());
       }
 
+      services = element.OwnerDocument.CreateElement("component", AuditManager.AUDIT_NS);
+      services.SetAttribute("id", "devices");
+      element.AppendChild(services);
       foreach (ServiceController service in ServiceController.GetDevices())
       {
-        XmlElement sel = element.OwnerDocument.CreateElement("Driver");
-        element.AppendChild(sel);
+        XmlElement sel = element.OwnerDocument.CreateElement("component", AuditManager.AUDIT_NS);
+        services.AppendChild(sel);
         sel.SetAttribute("id", service.ServiceName);
         sel.SetAttribute("name", service.DisplayName);
         sel.SetAttribute("status", service.Status.ToString().ToLower());

@@ -9,6 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BlueprintIT.Audit.AutoAudit</RootNamespace>
     <AssemblyName>AutoAudit</AssemblyName>
+    <StartupObject>AutoAudit.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -29,7 +30,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Management" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -39,6 +42,12 @@
     </Compile>
     <Compile Include="AutoAudit.Designer.cs">
       <DependentUpon>AutoAudit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Installer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Installer.Designer.cs">
+      <DependentUpon>Installer.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -52,6 +61,16 @@
       <Project>{20976BAB-F9DA-4430-A032-346FD0BC7C29}</Project>
       <Name>Utils</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="AutoAudit.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>AutoAudit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Installer.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>Installer.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -8,19 +8,21 @@ namespace BlueprintIT.Audit
 {
   internal class DiskAuditor : Auditor
   {
-    public override string ID
+    public string ID
     {
-      get { return "DiskAudit"; }
+      get { return "storage"; }
     }
 
-    public override void Audit(XmlElement el)
+    public string[] Component
     {
-      XmlElement element = el.OwnerDocument.CreateElement(ID);
-      el.AppendChild(element);
+      get { return new string[] { ID }; }
+    }
 
+    public void Audit(XmlElement element)
+    {
       foreach (DriveInfo drive in DriveInfo.GetDrives())
       {
-        XmlElement drv = element.OwnerDocument.CreateElement("Disk");
+        XmlElement drv = element.OwnerDocument.CreateElement("component", AuditManager.AUDIT_NS);
         element.AppendChild(drv);
         drv.SetAttribute("id", drive.Name[0].ToString());
         drv.SetAttribute("path", drive.Name);

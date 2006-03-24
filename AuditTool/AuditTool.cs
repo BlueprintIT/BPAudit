@@ -22,7 +22,13 @@ namespace BlueprintIT.Audit.AuditTool
 
     private void button1_Click(object sender, EventArgs e)
     {
-      AuditManager.AuditAndSubmit();
+      XmlDocument audit = AuditManager.PerformFullAudit();
+      if (AuditManager.TransmitItem(audit, true))
+        MessageBox.Show("Audit completed and transmitted successfully", "Audit Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+      else
+      {
+        MessageBox.Show("Audit could not be transmitted", "Audit Complete", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+      }
     }
   }
 }

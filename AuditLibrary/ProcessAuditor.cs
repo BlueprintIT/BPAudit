@@ -8,19 +8,21 @@ namespace BlueprintIT.Audit
 {
   internal class ProcessAuditor : Auditor
   {
-    public override string ID
+    public string ID
     {
-      get { return "ProcessAudit"; }
+      get { return "processes"; }
     }
 
-    public override void Audit(XmlElement el)
+    public string[] Component
     {
-      XmlElement element = el.OwnerDocument.CreateElement(ID);
-      el.AppendChild(element);
+      get { return new string[] { ID }; }
+    }
 
+    public void Audit(XmlElement element)
+    {
       foreach (Process process in Process.GetProcesses())
       {
-        XmlElement pel = element.OwnerDocument.CreateElement("Process");
+        XmlElement pel = element.OwnerDocument.CreateElement("component", AuditManager.AUDIT_NS);
         element.AppendChild(pel);
         pel.SetAttribute("id", process.ProcessName);
         pel.SetAttribute("memory", process.WorkingSet64.ToString());

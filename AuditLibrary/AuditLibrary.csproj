@@ -35,11 +35,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuditManager.cs" />
+    <Compile Include="ClientMonitor.cs" />
     <Compile Include="DiskAuditor.cs" />
     <Compile Include="NetworkAuditor.cs" />
     <Compile Include="ProcessAuditor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceAuditor.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Utils\Utils.csproj">
+      <Project>{20976BAB-F9DA-4430-A032-346FD0BC7C29}</Project>
+      <Name>Utils</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

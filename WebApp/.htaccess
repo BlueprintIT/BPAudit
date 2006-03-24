@@ -1,0 +1,4 @@
+RewriteEngine on 
+RewriteBase /
+
+RewriteRule ^submit$ submit.php
