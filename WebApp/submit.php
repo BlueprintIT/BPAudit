@@ -14,6 +14,58 @@ function error($code, $text)
 	exit;
 }
 
+function addList($system, $date, $component, $name, $element)
+{
+	global $db;
+	
+	$first = true;
+	$node = $element->firstChild;
+	while ($node !== null)
+	{
+		if ($node->nodeType == XML_ELEMENT_NODE)
+		{
+			if ($node->localName == 'item')
+			{
+				$value = $db->escape($node->getAttribute('value'));
+				
+				if ($first)
+				{
+					$db->queryExec('INSERT INTO listvalue (value) VALUES (\''.$value.'\');');
+					$id = $db->lastInsertRowid();
+					$db->queryExec('INSERT INTO value (component, system, id, date, list) VALUES ('.$component.','.$system.',\''.$db->escape($name).'\','.$date.','.$id.');');
+					$first=false;
+				}
+				else
+				{
+					$db->queryExec('INSERT INTO listvalue (id,value) VALUES ('.$id.',\''.$value.'\');');
+				}
+			}
+		}
+		$node = $node->nextSibling;
+	}
+	if ($first)
+	{
+		$db->queryExec('INSERT INTO value (component, system, id, date, list) VALUES ('.$component.','.$system.',\''.$db->escape($name).'\','.$date.',0);');
+	}
+}
+
+function addValue($system, $date, $component, $name, $value, $type)
+{
+	global $db;
+	
+	if ($type=='number')
+	{
+		$column = 'numbervalue';
+		$value = $db->escape($value);
+	}
+	else if ($type=='string')
+	{
+		$column = 'stringvalue';
+		$value = '\''.$db->escape($value).'\'';
+	}
+	$db->queryExec('INSERT INTO value (component, system, id, date, '.$column.', list) VALUES ('.$component.','.$system.',\''.$db->escape($name).'\','.$date.','.$value.',0);');
+}
+
 function parseComponent($system, $date, $component, $element)
 {
 	global $db;
@@ -30,7 +82,7 @@ function parseComponent($system, $date, $component, $element)
 		if ($node->name == 'id')
 			continue;
 
-		$db->queryExec('INSERT INTO stringvalue (component, system, id, date, value) VALUES ('.$component.','.$system.',\''.$db->escape($node->name).'\','.$db->escape($date).',\''.$db->escape($node->value).'\');');
+		addValue($system, $date, $component, $node->name, $node->value, 'string');
 	}
 	
 	$node = $element->firstChild;
@@ -50,19 +102,11 @@ function parseComponent($system, $date, $component, $element)
 			}
 			else if ($node->localName == 'value')
 			{
-				$name = $node->getAttribute('id');
-				$type = $node->getAttribute('type');
-				if ($type=='number')
-				{
-					$table = 'numbervalue';
-					$value = $db->escape($node->getAttribute('value'));
-				}
-				else if ($type=='string')
-				{
-					$table = 'stringvalue';
-					$value = '\''.$db->escape($node->getAttribute('value')).'\'';
-				}
-				$db->queryExec('INSERT INTO '.$table.' (component, system, id, date, value) VALUES ('.$component.','.$system.',\''.$db->escape($name).'\','.$date.','.$value.');');
+				addValue($system, $date, $component, $node->getAttribute('id'), $node->getAttribute('value'), $node->getAttribute('type'));
+			}
+			else if ($node->localName == 'list')
+			{
+				addList($system, $date, $component, $node->getAttribute('id'), $node);
 			}
 		}
 		$node = $node->nextSibling;
@@ -107,7 +151,7 @@ function parseAudit($document, $audit)
 		}
 		if ($audit->hasAttribute('hostname'))
 		{
-			$db->queryExec('UPDATE system SET name=\''.$db->escape($audit->getAttribute('hostname')).'\' WHERE id=\''.$db->escape($guid).'\';');
+			$db->queryExec('UPDATE system SET name=\''.$db->escape($audit->getAttribute('hostname')).'\' WHERE uid=\''.$db->escape($guid).'\';');
 		}
 		parseComponent($system, $date, 0, $audit);
 	}

@@ -22,42 +22,25 @@ DROP TABLE IF EXISTS component;
 CREATE TABLE IF NOT EXISTS component (
   rowid INTEGER NOT NULL auto_increment,
   parent INTEGER,
-  id VARCHAR(30),
+  id VARCHAR(50),
   PRIMARY KEY (rowid)
 );
 
-DROP TABLE IF EXISTS list;
-CREATE TABLE IF NOT EXISTS list (
-  rowid INTEGER NOT NULL auto_increment,
+DROP TABLE IF EXISTS value;
+CREATE TABLE IF NOT EXISTS value (
   system INTEGER NOT NULL,
   component INTEGER NOT NULL,
+  id VARCHAR(50) NOT NULL,
   `date` INTEGER,
-  id VARCHAR(30),
-  PRIMARY KEY (rowid)
+  stringvalue TEXT,
+  numbervalue BIGINT,
+  list INTEGER,
+  PRIMARY KEY (system, component, id, date)
 );
 
 DROP TABLE IF EXISTS listvalue;
 CREATE TABLE IF NOT EXISTS listvalue (
-  list INTEGER NOT NULL,
-  `value` TEXT
-);
-
-DROP TABLE IF EXISTS numbervalue;
-CREATE TABLE IF NOT EXISTS numbervalue (
-  system INTEGER NOT NULL,
-  component INTEGER NOT NULL,
-  id VARCHAR(30) NOT NULL,
-  `date` INTEGER,
-  `value` INTEGER,
-  PRIMARY KEY (system, component, id)
-);
-
-DROP TABLE IF EXISTS stringvalue;
-CREATE TABLE IF NOT EXISTS stringvalue (
-  system INTEGER NOT NULL,
-  component INTEGER NOT NULL,
-  id VARCHAR(30) NOT NULL,
-  `date` INTEGER,
+  list INTEGER NOT NULL auto_increment,
   `value` TEXT,
-  PRIMARY KEY (system, component, id)
+  PRIMARY KEY (list)
 );
