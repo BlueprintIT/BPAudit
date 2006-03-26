@@ -9,14 +9,15 @@ using System.Diagnostics;
 using System.Net;
 using BlueprintIT.Utils;
 using System.Net.NetworkInformation;
+using System.Threading;
 
 namespace BlueprintIT.Audit
 {
   public class AuditManager : Auditor
   {
     private static IList<Type> auditors = new List<Type>();
-    private static IList<Type> monitors = new List<Type>();
-    private static IList<Monitor> monitoring = new List<Monitor>();
+    private static IList<Type> observers = new List<Type>();
+    private static IList<Observer> observing = new List<Observer>();
 
     public static readonly string AUDIT_NS = "http://audit.blueprintit.co.uk";
 
@@ -45,7 +46,7 @@ namespace BlueprintIT.Audit
     private static void ScanAssembly(Assembly assembly)
     {
       Type auditor = Type.GetType("BlueprintIT.Audit.Auditor");
-      Type monitor = Type.GetType("BlueprintIT.Audit.Monitor");
+      Type monitor = Type.GetType("BlueprintIT.Audit.Observer");
       if ((auditor != null) && (monitor != null))
       {
         Type[] types = assembly.GetTypes();
@@ -58,7 +59,7 @@ namespace BlueprintIT.Audit
           if (auditor.IsAssignableFrom(type))
             auditors.Add(type);
           if (monitor.IsAssignableFrom(type))
-            monitors.Add(type);
+            observers.Add(type);
         }
       }
     }
@@ -90,7 +91,7 @@ namespace BlueprintIT.Audit
       return element;
     }
 
-    public static XmlElement GetMonitorConfig(Monitor item)
+    public static XmlElement GetMonitorConfig(Observer item)
     {
       XmlNode node = Config.FirstChild;
       while (node != null)
@@ -121,39 +122,51 @@ namespace BlueprintIT.Audit
       return null;
     }
 
-    public static void StartMonitors()
+    public static void StartObservers()
     {
-      if (monitoring.Count != 0)
-        return;
-
-      foreach (Type type in monitors)
+      Monitor.Enter(observing);
+      if (observing.Count > 0)
       {
-        ConstructorInfo constructor = type.GetConstructor(Type.EmptyTypes);
-        Monitor monitor = (Monitor)constructor.Invoke(null);
-        try
+        foreach (Type type in observers)
         {
-          monitor.Start();
-          monitoring.Add(monitor);
-        }
-        catch (Exception)
-        {
+          ConstructorInfo constructor = type.GetConstructor(Type.EmptyTypes);
+          Observer observer = (Observer)constructor.Invoke(null);
+          try
+          {
+            observer.Start();
+            observing.Add(observer);
+          }
+          catch (Exception)
+          {
+          }
         }
       }
+      Monitor.Exit(observing);
     }
 
-    public static void StopMonitors()
+    public static void AddObserver(Observer obs)
     {
-      foreach (Monitor monitor in monitoring)
+      Monitor.Enter(observing);
+      obs.Start();
+      observing.Add(obs);
+      Monitor.Exit(observing);
+    }
+
+    public static void StopObservers()
+    {
+      Monitor.Enter(observing);
+      foreach (Observer observer in observing)
       {
         try
         {
-          monitor.Stop();
+          observer.Stop();
         }
         catch (Exception)
         {
         }
       }
-      monitoring.Clear();
+      observing.Clear();
+      Monitor.Exit(observing);
     }
 
     private static XmlElement GetComponent(XmlElement parent, string[] path, int pos)
@@ -182,7 +195,7 @@ namespace BlueprintIT.Audit
     public static XmlDocument PerformFullAudit()
     {
       XmlDocument document = new XmlDocument();
-      document.AppendChild(document.CreateElement("audit", AUDIT_NS));
+      document.AppendChild(document.CreateElement("system", AUDIT_NS));
 
       document.DocumentElement.SetAttribute("id", Config.GetAttribute("id"));
       DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -283,6 +296,7 @@ namespace BlueprintIT.Audit
 
     public static void TransmitCachedItems()
     {
+      Monitor.Enter(observing);
       DirectoryInfo cache = DataDir.CreateSubdirectory("Cache");
       foreach (FileInfo file in cache.GetFiles("*.xml"))
       {
@@ -293,10 +307,12 @@ namespace BlueprintIT.Audit
         else
           break;
       }
+      Monitor.Exit(observing);
     }
 
     public static void CacheItem(XmlDocument document)
     {
+      Monitor.Enter(observing);
       DirectoryInfo cache = DataDir.CreateSubdirectory("Cache");
       Guid guid;
       do
@@ -305,6 +321,7 @@ namespace BlueprintIT.Audit
       } while (File.Exists(cache.FullName + "\\" + guid.ToString() + ".xml"));
 
       XmlUtils.SaveXml(document, cache.FullName + "\\" + guid.ToString() + ".xml");
+      Monitor.Exit(observing);
     }
 
     #region Auditor implementation
@@ -341,7 +358,7 @@ namespace BlueprintIT.Audit
         AuditAssembly(assemblys, type.Assembly, element);
       }
 
-      foreach (Type type in monitors)
+      foreach (Type type in observers)
       {
         AuditAssembly(assemblys, type.Assembly, element);
       }
@@ -364,7 +381,7 @@ namespace BlueprintIT.Audit
     void Audit(XmlElement element);
   }
 
-  public interface Monitor
+  public interface Observer
   {
     string ID
     {

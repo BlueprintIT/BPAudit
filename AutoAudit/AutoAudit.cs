@@ -17,7 +17,7 @@ namespace AutoAudit
 
     protected override void OnStart(string[] args)
     {
-      AuditManager.StartMonitors();
+      AuditManager.StartObservers();
     }
 
     protected override void OnPause()
@@ -32,7 +32,7 @@ namespace AutoAudit
     
     protected override void OnStop()
     {
-      AuditManager.StopMonitors();
+      AuditManager.StopObservers();
     }
 
     protected override bool OnPowerEvent(PowerBroadcastStatus powerStatus)

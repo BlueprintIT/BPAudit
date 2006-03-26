@@ -25,10 +25,19 @@ namespace BlueprintIT.Audit
         XmlElement pel = element.OwnerDocument.CreateElement("component", AuditManager.AUDIT_NS);
         element.AppendChild(pel);
         pel.SetAttribute("id", process.ProcessName);
-        pel.SetAttribute("memory", process.WorkingSet64.ToString());
+
+        XmlElement value = element.OwnerDocument.CreateElement("value", AuditManager.AUDIT_NS);
+        value.SetAttribute("type", "number");
+        value.SetAttribute("id", "memory");
+        value.SetAttribute("value", process.WorkingSet64.ToString());
+        pel.AppendChild(value);
         try
         {
-          pel.SetAttribute("cpu", process.TotalProcessorTime.TotalSeconds.ToString("F0"));
+          value = element.OwnerDocument.CreateElement("value", AuditManager.AUDIT_NS);
+          value.SetAttribute("type", "number");
+          value.SetAttribute("id", "cpu");
+          value.SetAttribute("value", process.TotalProcessorTime.TotalSeconds.ToString());
+          pel.AppendChild(value);
         }
         catch (Exception)
         {

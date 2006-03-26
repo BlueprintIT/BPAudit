@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace BlueprintIT.Audit
 {
-  internal class ClientMonitor : Monitor
+  internal class ClientMonitor : Observer
   {
     private HttpListener listener;
 
